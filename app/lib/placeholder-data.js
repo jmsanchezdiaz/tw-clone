@@ -1,7 +1,9 @@
+const { uuid } = require("uuidv4");
 // Starter data
-export const profiles = [
+
+const profiles = [
   {
-    id: "5f10e9e6b090019855d87e10679faaa574abbd1c1d6e698085fd0192f9b28ed5",
+    id: uuid(),
     name: "John Doe",
     username: "johndoe93",
     email: "johndoe93@gmail.com",
@@ -9,7 +11,7 @@ export const profiles = [
     description: "Me llamo john doe!"
   },
   {
-    id: "5710e9e6b090019855d87e10679faaa574abbd1c1d6e698085fd0192f9b28ed5",
+    id: uuid(),
     name: "el leon de la economia",
     username: "Javier Milei",
     email: "eljavo@gmail.com",
@@ -18,19 +20,25 @@ export const profiles = [
   }
 ];
 
-export const tweets = [
+const tweets = [
   {
-    id: "",
+    id: uuid(),
     body: "hola mundo",
     profile_id: profiles[0].id
   }
 ];
 
-export const replies = [
+const replies = [
   {
-    id: "bc2ed75edca209f05e95d0aa6ec0b1627e55dffcd55f38316f5dc07a2ef69d36",
+    id: uuid(),
     body: "hola john!",
     profile_id: profiles[1].id,
     tweet_id: tweets[0].id
   }
 ];
+
+module.exports = {
+  profiles,
+  tweets,
+  replies
+};

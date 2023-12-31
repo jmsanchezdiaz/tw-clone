@@ -1,6 +1,6 @@
 const { db } = require("@vercel/postgres");
 const bcrypt = require("bcrypt");
-const { profiles, tweets } = require("../app/lib/placeholder-data.js");
+const { profiles, tweets, replies } = require("../app/lib/placeholder-data.js");
 
 async function seedProfiles(client) {
   try {
@@ -13,9 +13,9 @@ async function seedProfiles(client) {
         username VARCHAR(255) NOT NULL UNIQUE,
         email TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         description TEXT,
-        avatar_url TEXT,
+        avatar_url TEXT
         )
     `;
 
@@ -25,8 +25,8 @@ async function seedProfiles(client) {
       profiles.map(async (profile) => {
         const hashedPass = await bcrypt.hash(profile.password, 10);
         return client.sql`
-        INSERT INTO profiles (name, username, email, password, description)
-        VALUES (${profile.name}, ${profile.username}, ${profile.email}, ${hashedPass}, ${profile.description} )
+        INSERT INTO profiles (id, name, username, email, password, description)
+        VALUES (${profile.id}, ${profile.name}, ${profile.username}, ${profile.email}, ${hashedPass}, ${profile.description} )
         ON CONFLICT (id) DO NOTHING;
       `;
       })
@@ -51,7 +51,7 @@ async function seedTweets(client) {
       CREATE TABLE IF NOT EXISTS tweets (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         body TEXT NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
         profile_id UUID REFERENCES profiles(id)
         )
     `;
@@ -62,7 +62,7 @@ async function seedTweets(client) {
       tweets.map(async (tweet) => {
         return client.sql`
         INSERT INTO tweets (id, body, profile_id)
-        VALUES ((${tweet.id}, ${tweet.body}, ${tweet.profile_id})
+        VALUES (${tweet.id}, ${tweet.body}, ${tweet.profile_id})
         ON CONFLICT (id) DO NOTHING;
       `;
       })
@@ -87,8 +87,8 @@ async function seedReplies(client) {
       CREATE TABLE IF NOT EXISTS replies (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         body TEXT NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
-        profile_id UUID REFERENCES profiles(id)
+        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+        profile_id UUID REFERENCES profiles(id),
         tweet_id UUID REFERENCES tweets(id)
         )
     `;
@@ -99,7 +99,7 @@ async function seedReplies(client) {
       replies.map(async (reply) => {
         return client.sql`
         INSERT INTO replies (id, body, profile_id, tweet_id)
-        VALUES ((${reply.id}, ${reply.body}, ${reply.profile_id}, ${reply.tweet_id})
+        VALUES (${reply.id}, ${reply.body}, ${reply.profile_id}, ${reply.tweet_id})
         ON CONFLICT (id) DO NOTHING;
       `;
       })
